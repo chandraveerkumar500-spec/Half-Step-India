@@ -3,12 +3,13 @@
 import { useState } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import { ArrowRight, ShieldCheck, UserRound } from "lucide-react";
 
 const demoUsers = [
-  { role: "Admin", email: "admin@halfstep.in", password: "admin123" },
-  { role: "Department Officer", email: "amit@halfstep.in", password: "admin123" },
-  { role: "Field Inspector", email: "rajesh@halfstep.in", password: "inspector123" },
-  { role: "Citizen", email: "citizen@halfstep.in", password: "citizen123" },
+  { role: "Admin", email: "admin@halfstep.in", destination: "Dashboard + alerts overview" },
+  { role: "Department Officer", email: "amit@halfstep.in", destination: "Asset triage + work orders" },
+  { role: "Field Inspector", email: "rajesh@halfstep.in", destination: "On-ground report workflow" },
+  { role: "Citizen", email: "citizen@halfstep.in", destination: "Public issue reporting" },
 ];
 
 export default function LoginPage() {
@@ -18,8 +19,8 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = async (event: React.FormEvent) => {
+    event.preventDefault();
     setLoading(true);
     setError("");
 
@@ -43,120 +44,123 @@ export default function LoginPage() {
     }
   };
 
-  const fillDemoUser = (demoEmail: string, demoPassword: string) => {
+  const applyDemoUser = (demoEmail: string) => {
     setEmail(demoEmail);
-    setPassword(demoPassword);
     setError("");
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-zinc-50 dark:bg-zinc-950 px-4 py-10">
-      <div className="w-full max-w-5xl grid gap-8 lg:grid-cols-[1.2fr_0.9fr]">
-        <div className="bg-white dark:bg-zinc-900 rounded-2xl shadow-lg p-8">
+    <div className="app-shell min-h-[calc(100vh-4.5rem)] px-4 py-10 sm:px-6">
+      <div className="mx-auto grid max-w-7xl gap-8 lg:grid-cols-[1.15fr_0.85fr]">
+        <section className="hero-panel p-8">
           <div className="mb-8">
-            <p className="text-sm font-medium text-blue-600 dark:text-blue-400 mb-2">
-              Role-based access enabled
-            </p>
-            <h2 className="text-3xl font-bold text-zinc-900 dark:text-white mb-2">
-              Sign in by role
-            </h2>
-            <p className="text-zinc-600 dark:text-zinc-400">
-              Use the correct account for admin, department officer, field inspector, or citizen access.
+            <p className="section-kicker">Role-Based Demo Entry</p>
+            <h1 className="mt-3 font-heading text-5xl font-semibold tracking-[-0.06em] text-foreground">
+              Enter the Half-Step India workflow by role.
+            </h1>
+            <p className="mt-4 max-w-2xl text-lg leading-8 text-muted-foreground">
+              This screen is the merge-safe bridge between the seeded backend and the README demo story: admin insight,
+              officer triage, inspector reporting, and citizen submissions.
             </p>
           </div>
 
-          <div className="grid gap-3 sm:grid-cols-2">
+          <div className="grid gap-4 md:grid-cols-2">
             {demoUsers.map((demoUser) => (
               <button
                 key={demoUser.email}
                 type="button"
-                onClick={() => fillDemoUser(demoUser.email, demoUser.password)}
-                className="rounded-xl border border-zinc-200 dark:border-zinc-800 p-4 text-left hover:border-blue-400 hover:bg-blue-50/60 dark:hover:bg-blue-900/10 transition-colors"
+                onClick={() => applyDemoUser(demoUser.email)}
+                className="surface-card p-5 text-left transition hover:-translate-y-0.5 hover:border-primary/30"
               >
-                <p className="text-sm font-semibold text-zinc-900 dark:text-white">
-                  {demoUser.role}
-                </p>
-                <p className="text-sm text-zinc-600 dark:text-zinc-400 mt-1">
-                  {demoUser.email}
-                </p>
-                <p className="text-xs text-zinc-500 mt-2">Click to autofill credentials</p>
+                <div className="mb-4 flex items-center justify-between gap-3">
+                  <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/12 text-primary">
+                    <UserRound className="h-5 w-5" />
+                  </div>
+                  <div className="rounded-full bg-[rgba(11,110,79,0.12)] px-3 py-1 text-xs font-semibold uppercase tracking-[0.16em] text-[var(--color-safe)]">
+                    {demoUser.role}
+                  </div>
+                </div>
+                <div className="font-semibold text-foreground">{demoUser.email}</div>
+                <div className="mt-2 text-sm text-muted-foreground">{demoUser.destination}</div>
+                <div className="mt-4 text-xs font-semibold uppercase tracking-[0.18em] text-[var(--color-signal)]">
+                  Click to autofill
+                </div>
               </button>
             ))}
           </div>
-        </div>
+        </section>
 
-        <div className="bg-white dark:bg-zinc-900 rounded-2xl shadow-lg p-8">
-          <div className="text-center mb-8">
-            <h1 className="text-2xl font-bold text-zinc-900 dark:text-white mb-2">
-              Half-Step India
-            </h1>
-            <p className="text-zinc-600 dark:text-zinc-400">
-              Infrastructure Monitoring System
-            </p>
+        <section className="surface-card p-8">
+          <div className="mb-8 text-center">
+            <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-primary/12 text-primary">
+              <ShieldCheck className="h-7 w-7" />
+            </div>
+            <h2 className="font-heading text-3xl font-semibold tracking-[-0.05em] text-foreground">Sign in</h2>
+            <p className="mt-2 text-muted-foreground">Use the seeded accounts to review the real MVP flow.</p>
           </div>
 
-          {error && (
-            <div className="mb-4 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg text-red-600 dark:text-red-400 text-sm">
+          {error ? (
+            <div className="mb-4 rounded-2xl border border-[rgba(209,67,43,0.18)] bg-[rgba(209,67,43,0.08)] px-4 py-3 text-sm font-medium text-[var(--color-critical)]">
               {error}
             </div>
-          )}
+          ) : null}
 
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-5">
             <div>
-              <label
-                htmlFor="email"
-                className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1"
-              >
+              <label htmlFor="email" className="mb-2 block text-sm font-semibold text-foreground">
                 Email
               </label>
               <input
                 id="email"
                 type="email"
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                onChange={(event) => setEmail(event.target.value)}
                 required
-                className="w-full px-4 py-2 border border-zinc-300 dark:border-zinc-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-zinc-800 text-zinc-900 dark:text-white"
+                className="w-full rounded-2xl border border-border bg-background/80 px-4 py-3 text-foreground outline-none transition focus:border-primary/40 focus:ring-2 focus:ring-primary/20"
                 placeholder="role@example.com"
               />
             </div>
 
             <div>
-              <label
-                htmlFor="password"
-                className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1"
-              >
+              <label htmlFor="password" className="mb-2 block text-sm font-semibold text-foreground">
                 Password
               </label>
               <input
                 id="password"
                 type="password"
                 value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                onChange={(event) => setPassword(event.target.value)}
                 required
-                className="w-full px-4 py-2 border border-zinc-300 dark:border-zinc-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-zinc-800 text-zinc-900 dark:text-white"
-                placeholder="••••••••"
+                className="w-full rounded-2xl border border-border bg-background/80 px-4 py-3 text-foreground outline-none transition focus:border-primary/40 focus:ring-2 focus:ring-primary/20"
+                placeholder="Enter seeded password"
               />
             </div>
 
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-2.5 px-4 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-medium rounded-lg transition-colors"
+              className="flex w-full items-center justify-center gap-2 rounded-full bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground transition hover:opacity-90 disabled:opacity-60"
             >
-              {loading ? "Signing in..." : "Sign In"}
+              {loading ? "Signing in..." : "Open command center"}
+              <ArrowRight className="h-4 w-4" />
             </button>
           </form>
 
-          <div className="mt-6 pt-6 border-t border-zinc-200 dark:border-zinc-800">
-            <div className="space-y-2 text-xs text-zinc-500 dark:text-zinc-500">
+          <div className="mt-8 rounded-2xl border border-border/70 bg-background/70 p-4">
+            <div className="text-[11px] font-semibold uppercase tracking-[0.22em] text-muted-foreground">Demo Accounts</div>
+            <div className="mt-3 space-y-2 text-sm text-muted-foreground">
               {demoUsers.map((demoUser) => (
-                <p key={demoUser.email}>
-                  {demoUser.role}: {demoUser.email} / {demoUser.password}
-                </p>
+                <div key={demoUser.email}>
+                  <span className="font-semibold text-foreground">{demoUser.role}</span>: {demoUser.email}
+                </div>
               ))}
             </div>
+            <p className="mt-3 text-xs leading-6 text-muted-foreground">
+              Passwords stay in the seeded backend only. Pick an account to fill the email, then enter the seeded password
+              from your environment.
+            </p>
           </div>
-        </div>
+        </section>
       </div>
     </div>
   );

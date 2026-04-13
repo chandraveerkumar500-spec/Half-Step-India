@@ -1,6 +1,6 @@
-import { prisma } from "@/lib/db";
 import Link from "next/link";
-import { WorkOrderStatus, WorkOrderPriority } from "@prisma/client";
+import { WorkOrderPriority, WorkOrderStatus } from "@prisma/client";
+import { prisma } from "@/lib/db";
 
 export const dynamic = "force-dynamic";
 
@@ -34,98 +34,48 @@ export default async function WorkOrdersPage() {
   };
 
   return (
-    <div>
-      <header className="mb-8">
-        <h1 className="text-2xl font-bold text-zinc-900 dark:text-white">
-          Work Orders
-        </h1>
-        <p className="text-zinc-600 dark:text-zinc-400">
-          Track maintenance and repair tasks
-        </p>
-      </header>
+    <div className="app-shell min-h-screen">
+      <div className="mx-auto max-w-7xl p-8">
+        <section className="hero-panel mb-8 p-8">
+          <div className="section-kicker">Dispatch Queue</div>
+          <h1 className="mt-3 font-heading text-4xl font-semibold tracking-[-0.05em] text-foreground">
+            Track the maintenance orders created by score deterioration.
+          </h1>
+          <p className="mt-3 max-w-3xl text-base leading-7 text-muted-foreground">
+            This queue closes the loop between report submission and intervention, showing why each work order exists and
+            which asset triggered it.
+          </p>
+        </section>
 
-      <div className="bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-800 overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead className="bg-zinc-50 dark:bg-zinc-800 border-b border-zinc-200 dark:border-zinc-700">
-              <tr>
-                <th className="text-left px-6 py-3 text-sm font-medium text-zinc-700 dark:text-zinc-300">
-                  Asset
-                </th>
-                <th className="text-left px-6 py-3 text-sm font-medium text-zinc-700 dark:text-zinc-300">
-                  Reason
-                </th>
-                <th className="text-center px-6 py-3 text-sm font-medium text-zinc-700 dark:text-zinc-300">
-                  Priority
-                </th>
-                <th className="text-center px-6 py-3 text-sm font-medium text-zinc-700 dark:text-zinc-300">
-                  Status
-                </th>
-                <th className="text-left px-6 py-3 text-sm font-medium text-zinc-700 dark:text-zinc-300">
-                  Department
-                </th>
-                <th className="text-left px-6 py-3 text-sm font-medium text-zinc-700 dark:text-zinc-300">
-                  Assigned To
-                </th>
-                <th className="text-left px-6 py-3 text-sm font-medium text-zinc-700 dark:text-zinc-300">
-                  Created
-                </th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-zinc-200 dark:divide-zinc-800">
-              {workOrders.map((wo) => (
-                <tr
-                  key={wo.id}
-                  className="hover:bg-zinc-50 dark:hover:bg-zinc-800/50"
-                >
-                  <td className="px-6 py-4">
-                    <Link
-                      href={`/assets/${wo.assetId}`}
-                      className="font-medium text-zinc-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-400"
-                    >
-                      {wo.asset.name}
-                    </Link>
-                  </td>
-                  <td className="px-6 py-4 text-zinc-700 dark:text-zinc-300 max-w-xs truncate">
-                    {wo.reason}
-                  </td>
-                  <td className="px-6 py-4 text-center">
-                    <span
-                      className={`inline-block px-2 py-1 text-xs font-medium rounded-full ${priorityColors[wo.priority]}`}
-                    >
-                      {wo.priority}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 text-center">
-                    <span
-                      className={`inline-block px-2 py-1 text-xs font-medium rounded-full ${statusColors[wo.status]}`}
-                    >
-                      {wo.status.replace("_", " ")}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 text-zinc-700 dark:text-zinc-300">
-                    {wo.department?.name || "N/A"}
-                  </td>
-                  <td className="px-6 py-4 text-zinc-700 dark:text-zinc-300">
-                    {wo.assignedUser?.name || "Unassigned"}
-                  </td>
-                  <td className="px-6 py-4 text-zinc-700 dark:text-zinc-300">
-                    {new Date(wo.createdAt).toLocaleDateString()}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+        <div className="space-y-4">
+          {workOrders.map((workOrder) => (
+            <div key={workOrder.id} className="surface-card p-6">
+              <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+                <div>
+                  <Link href={`/assets/${workOrder.assetId}`} className="font-heading text-2xl font-semibold tracking-[-0.04em] text-foreground transition hover:text-primary">
+                    {workOrder.asset.name}
+                  </Link>
+                  <div className="mt-2 text-sm leading-6 text-muted-foreground">{workOrder.reason}</div>
+                  <div className="mt-3 text-sm text-muted-foreground">
+                    {workOrder.department?.name || "N/A"} · Assigned to {workOrder.assignedUser?.name || "Unassigned"}
+                  </div>
+                </div>
+                <div className="flex gap-2">
+                  <span className={`rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-[0.16em] ${priorityColors[workOrder.priority]}`}>
+                    {workOrder.priority}
+                  </span>
+                  <span className={`rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-[0.16em] ${statusColors[workOrder.status]}`}>
+                    {workOrder.status.replace("_", " ")}
+                  </span>
+                </div>
+              </div>
+              <div className="mt-4 text-xs text-muted-foreground">{new Date(workOrder.createdAt).toLocaleString()}</div>
+            </div>
+          ))}
+          {workOrders.length === 0 ? (
+            <div className="surface-card px-6 py-10 text-center text-sm text-muted-foreground">No work orders found.</div>
+          ) : null}
         </div>
-
-        {workOrders.length === 0 && (
-          <div className="text-center py-12">
-            <p className="text-zinc-500">No work orders found</p>
-            <p className="text-sm text-zinc-400 mt-2">
-              Work orders are created automatically when critical thresholds are crossed
-            </p>
-          </div>
-        )}
       </div>
     </div>
   );

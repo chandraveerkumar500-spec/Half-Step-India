@@ -3,19 +3,14 @@ interface DashboardCardProps {
   value: string | number;
   subtitle?: string;
   icon: string;
-  trend?: {
-    value: number;
-    positive: boolean;
-  };
-  color?: "blue" | "green" | "yellow" | "red" | "purple";
+  color?: "safe" | "signal" | "critical" | "info";
 }
 
-const colorClasses = {
-  blue: "bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400",
-  green: "bg-green-50 dark:bg-green-900/20 text-green-600 dark:text-green-400",
-  yellow: "bg-yellow-50 dark:bg-yellow-900/20 text-yellow-600 dark:text-yellow-400",
-  red: "bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400",
-  purple: "bg-purple-50 dark:bg-purple-900/20 text-purple-600 dark:text-purple-400",
+const accentStyles = {
+  safe: "bg-[rgba(11,110,79,0.12)] text-[var(--color-safe)]",
+  signal: "bg-[rgba(166,90,34,0.12)] text-[var(--color-signal)]",
+  critical: "bg-[rgba(209,67,43,0.12)] text-[var(--color-critical)]",
+  info: "bg-[rgba(59,130,246,0.12)] text-blue-600",
 };
 
 export default function DashboardCard({
@@ -23,37 +18,21 @@ export default function DashboardCard({
   value,
   subtitle,
   icon,
-  trend,
-  color = "blue",
+  color = "info",
 }: DashboardCardProps) {
   return (
-    <div className="bg-white dark:bg-zinc-900 rounded-xl p-6 border border-zinc-200 dark:border-zinc-800">
-      <div className="flex items-start justify-between">
+    <div className="surface-card p-6">
+      <div className="flex items-start justify-between gap-4">
         <div>
-          <p className="text-sm font-medium text-zinc-600 dark:text-zinc-400 mb-1">
+          <div className="text-[11px] font-semibold uppercase tracking-[0.22em] text-muted-foreground">
             {title}
-          </p>
-          <h3 className="text-2xl font-bold text-zinc-900 dark:text-white">
+          </div>
+          <div className="mt-3 font-heading text-4xl font-semibold tracking-[-0.06em] text-foreground">
             {value}
-          </h3>
-          {subtitle && (
-            <p className="text-xs text-zinc-500 dark:text-zinc-500 mt-1">
-              {subtitle}
-            </p>
-          )}
-          {trend && (
-            <p
-              className={`text-xs mt-2 font-medium ${
-                trend.positive ? "text-green-600" : "text-red-600"
-              }`}
-            >
-              {trend.positive ? "↑" : "↓"} {trend.value}%
-            </p>
-          )}
+          </div>
+          {subtitle ? <div className="mt-2 text-sm text-muted-foreground">{subtitle}</div> : null}
         </div>
-        <div
-          className={`w-12 h-12 rounded-xl flex items-center justify-center text-2xl ${colorClasses[color]}`}
-        >
+        <div className={`flex h-12 w-12 items-center justify-center rounded-2xl text-xl ${accentStyles[color]}`}>
           {icon}
         </div>
       </div>

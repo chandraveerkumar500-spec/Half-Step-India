@@ -1,6 +1,6 @@
-import { prisma } from "@/lib/db";
 import Link from "next/link";
 import { AlertSeverity } from "@prisma/client";
+import { prisma } from "@/lib/db";
 
 export const dynamic = "force-dynamic";
 
@@ -25,96 +25,47 @@ export default async function AlertsPage() {
   };
 
   return (
-    <div>
-      <header className="mb-8">
-        <h1 className="text-2xl font-bold text-zinc-900 dark:text-white">
-          Alerts
-        </h1>
-        <p className="text-zinc-600 dark:text-zinc-400">
-          Monitor threshold alerts and degradation warnings
-        </p>
-      </header>
+    <div className="app-shell min-h-screen">
+      <div className="mx-auto max-w-7xl p-8">
+        <section className="hero-panel mb-8 p-8">
+          <div className="section-kicker">Alert Feed</div>
+          <h1 className="mt-3 font-heading text-4xl font-semibold tracking-[-0.05em] text-foreground">
+            Monitor threshold breaches and degradation warnings.
+          </h1>
+          <p className="mt-3 max-w-3xl text-base leading-7 text-muted-foreground">
+            Alerts are generated directly from report score transitions, so this screen shows whether the scoring logic
+            is producing the right maintenance signals.
+          </p>
+        </section>
 
-      <div className="bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-800 overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead className="bg-zinc-50 dark:bg-zinc-800 border-b border-zinc-200 dark:border-zinc-700">
-              <tr>
-                <th className="text-left px-6 py-3 text-sm font-medium text-zinc-700 dark:text-zinc-300">
-                  Asset
-                </th>
-                <th className="text-left px-6 py-3 text-sm font-medium text-zinc-700 dark:text-zinc-300">
-                  Alert Type
-                </th>
-                <th className="text-center px-6 py-3 text-sm font-medium text-zinc-700 dark:text-zinc-300">
-                  Severity
-                </th>
-                <th className="text-left px-6 py-3 text-sm font-medium text-zinc-700 dark:text-zinc-300">
-                  Message
-                </th>
-                <th className="text-center px-6 py-3 text-sm font-medium text-zinc-700 dark:text-zinc-300">
-                  Status
-                </th>
-                <th className="text-left px-6 py-3 text-sm font-medium text-zinc-700 dark:text-zinc-300">
-                  Created
-                </th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-zinc-200 dark:divide-zinc-800">
-              {alerts.map((alert) => (
-                <tr
-                  key={alert.id}
-                  className="hover:bg-zinc-50 dark:hover:bg-zinc-800/50"
-                >
-                  <td className="px-6 py-4">
-                    <Link
-                      href={`/assets/${alert.assetId}`}
-                      className="font-medium text-zinc-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-400"
-                    >
-                      {alert.asset.name}
-                    </Link>
-                  </td>
-                  <td className="px-6 py-4 text-zinc-700 dark:text-zinc-300 capitalize">
-                    {alert.alertType.replace("_", " ")}
-                  </td>
-                  <td className="px-6 py-4 text-center">
-                    <span
-                      className={`inline-block px-2 py-1 text-xs font-medium rounded-full ${severityColors[alert.severity]}`}
-                    >
-                      {alert.severity}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 text-zinc-700 dark:text-zinc-300">
-                    {alert.message}
-                  </td>
-                  <td className="px-6 py-4 text-center">
-                    <span
-                      className={`inline-block px-2 py-1 text-xs font-medium rounded-full ${
-                        alert.isAcknowledged
-                          ? "bg-green-100 text-green-800"
-                          : "bg-yellow-100 text-yellow-800"
-                      }`}
-                    >
-                      {alert.isAcknowledged ? "Acknowledged" : "Pending"}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 text-zinc-700 dark:text-zinc-300">
-                    {new Date(alert.createdAt).toLocaleDateString()}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+        <div className="space-y-4">
+          {alerts.map((alert) => (
+            <div key={alert.id} className="surface-card p-6">
+              <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+                <div>
+                  <Link href={`/assets/${alert.assetId}`} className="font-heading text-2xl font-semibold tracking-[-0.04em] text-foreground transition hover:text-primary">
+                    {alert.asset.name}
+                  </Link>
+                  <div className="mt-2 text-sm leading-6 text-muted-foreground">{alert.message}</div>
+                </div>
+                <div className="flex gap-2">
+                  <span className={`rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-[0.16em] ${severityColors[alert.severity]}`}>
+                    {alert.severity}
+                  </span>
+                  <span className={`rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-[0.16em] ${alert.isAcknowledged ? "bg-green-100 text-green-800" : "bg-yellow-100 text-yellow-800"}`}>
+                    {alert.isAcknowledged ? "Acknowledged" : "Pending"}
+                  </span>
+                </div>
+              </div>
+              <div className="mt-4 text-xs text-muted-foreground">
+                {alert.alertType.replace("_", " ")} · {new Date(alert.createdAt).toLocaleString()}
+              </div>
+            </div>
+          ))}
+          {alerts.length === 0 ? (
+            <div className="surface-card px-6 py-10 text-center text-sm text-muted-foreground">No alerts found.</div>
+          ) : null}
         </div>
-
-        {alerts.length === 0 && (
-          <div className="text-center py-12">
-            <p className="text-zinc-500">No alerts found</p>
-            <p className="text-sm text-zinc-400 mt-2">
-              Alerts will be created automatically when scores drop across thresholds
-            </p>
-          </div>
-        )}
       </div>
     </div>
   );
